@@ -340,7 +340,7 @@ export const TodoListItem = (props: Props) => {
 ```
 Now we have a To Do List application where deleting an item sends it to the recycle bin. We can restore items from the recycle bin or empty it to permanently delete items. We also have a log of all our actions.
 
-## Epilog: Handling large applications
+## Epilogue: Handling large applications
 
 One of the most powerful aspects of the Recoil architecture is atoms are independent of one another. While this tutorial builds a singleton dispatcher, you can have multiple dispatchers.
 
