@@ -9,13 +9,13 @@ This example is the ToDo list application demonstrates how to create a dispatche
 
 ## Intro
 
-Recoil provides great state management hooks so why would anyone want or need the dispatcher pattern?
+Recoil provides great state management hooks. Components can easily update state using the same familiar mechanism from React.useState(). Why would anyone want or need the dispatcher pattern?
 
 The dispatcher pattern allows for UI components to invoke state update logic shared across the application. It is a common pattern in other state management libraries for React. Many applications centralize or share state management updates under various names (e.g. dispatcher, pub/sub event bus, handlers).
 
-While the useRecoilState() hook provides state management within React components, it can cause duplicate update code in medium to large applications. The dispatcher pattern helps separate concerns; the React component is concerned with rendering current state, and the dispatcher with updating state.
+While the useRecoilState() hook provides state management within React components, it can cause update code to be duplicated as application size and complexity grows. The dispatcher pattern helps separate concerns; the React component is only concerned with rendering current state, and the dispatcher with updating application-level state.
 
-Consider the dispatcher pattern when you have the same action taken from multiple places in your UI and the logic of the action is complex enough to avoid duplicating it in several places.
+Consider the dispatcher pattern when you have the same action taken from multiple places in your UI and the logic of the action is complex enough that duplicating it in several places would cause extra work and bugs.
 
 ## About the tutorial
 
@@ -340,8 +340,10 @@ export const TodoListItem = (props: Props) => {
 ```
 Now we have a To Do List application where deleting an item sends it to the recycle bin. We can restore items from the recycle bin or empty it to permanently delete items. We also have a log of all our actions.
 
-## Handling large applications
+## Epilog: Handling large applications
 
 One of the most powerful aspects of the Recoil architecture is atoms are independent of one another. While this tutorial builds a singleton dispatcher, you can have multiple dispatchers.
 
 Large applications may want to group the update methods for independent types into multiple dispatchers. For example, a store front application could have a customers dispatcher, a product inventory dispatcher, and an orders dispatcher.
+
+Updating a large application to the dispatcher pattern can be done incrementally. Code can be factored out of the components into the dispatcher one update method at a time.
