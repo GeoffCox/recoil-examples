@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TodoList } from "./TodoList2";
+import { TodoList } from "./TodoList";
 import { RecoilRoot } from "recoil";
 
 export const App = () => {
