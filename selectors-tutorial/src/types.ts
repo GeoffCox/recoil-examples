@@ -1,7 +1,7 @@
-export type ToDoItem = {
+export type TodoItem = {
     id: number;
     text: string;
     isComplete: boolean;
 };
 
-export type ToDoFilter = 'Show Completed' | 'Show Uncompleted' | 'Show All';
+export type TodoFilter = 'Show Completed' | 'Show Uncompleted' | 'Show All';

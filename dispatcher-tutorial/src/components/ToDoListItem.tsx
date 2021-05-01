@@ -1,11 +1,11 @@
 import * as React from "react";
 import { useRecoilState, useRecoilValue } from "recoil";
-import { ToDoItem } from "../types";
+import { TodoItem } from "../types";
 import { todoListState, dispatcherState } from "../atoms";
 import { replaceItemAtIndex } from "../utils";
 
 type Props = {
-  item: ToDoItem;
+  item: TodoItem;
 };
 
 export const TodoListItem = (props: Props) => {

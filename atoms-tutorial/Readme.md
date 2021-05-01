@@ -1,12 +1,12 @@
 # Recoil Atoms Tutorial
 
-This example is the ToDo list application described in the atoms tutorial: https://recoiljs.org/docs/basic-tutorial/atoms. 
+This example is the Todo list application described in the atoms tutorial: https://recoiljs.org/docs/basic-tutorial/atoms. 
 
 - This example demonstrates the use of atom(), useRecoilValue(), and useRecoilState().
 
 - This code updated to use Typescript:
-  - Defined the ToDoItem type
-  - Renamed ToDoItem to ToDoListItem to avoid conflict with the newly defined ToDoItem type.
+  - Defined the TodoItem type
+  - Renamed TodoItem to TodoListItem to avoid conflict with the newly defined TodoItem type.
   - Moved the utility functions to a utils.ts module
   - Updated functions to the lambda form
   - Updated event handlers to use event types

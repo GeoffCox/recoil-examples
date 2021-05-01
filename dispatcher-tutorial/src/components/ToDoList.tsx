@@ -1,16 +1,16 @@
 import * as React from "react";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { filteredTodoListState } from "../selectors";
-import { TodoItemCreator } from "./ToDoItemCreator";
-import { TodoListItem } from "./ToDoListItem";
-import { TodoListStats } from "./ToDoListStats";
-import { TodoListFilters } from "./ToDoListFilters";
+import { TodoItemCreator } from "./TodoItemCreator";
+import { TodoListItem } from "./TodoListItem";
+import { TodoListStats } from "./TodoListStats";
+import { TodoListFilters } from "./TodoListFilters";
 import { RecycleBinList } from "./RecycleBinList";
 import { createDispatcher, Dispatcher } from "../dispatcher";
 import { dispatcherState } from "../atoms";
 import { Log } from "./Log";
 
-export const ToDoList = () => {
+export const TodoList = () => {
     const todoList = useRecoilValue(filteredTodoListState);
     const setDispatcher = useSetRecoilState(dispatcherState);
 

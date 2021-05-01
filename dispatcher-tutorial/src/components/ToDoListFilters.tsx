@@ -1,7 +1,7 @@
 import * as React from "react";
 import { todoListFilterState } from "../atoms";
 import { useRecoilState } from "recoil";
-import { ToDoFilter } from "../types";
+import { TodoFilter } from "../types";
 
 export const TodoListFilters = () => {
   const [filter, setFilter] = useRecoilState(todoListFilterState);
@@ -10,7 +10,7 @@ export const TodoListFilters = () => {
     const {
       target: { value },
     } = event;
-    setFilter(value as ToDoFilter);
+    setFilter(value as TodoFilter);
   };
 
   return (
