@@ -8,7 +8,7 @@ type Props = {
   item: ToDoItem;
 };
 
-export const TodoListItem = (props: Props) => {
+export const TodoItem = (props: Props) => {
   const { item } = props;
 
   const [todoList, setTodoList] = useRecoilState(todoListState);
