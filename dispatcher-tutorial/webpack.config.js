@@ -55,8 +55,8 @@ module.exports = {
   // Tells the HTML webpack plug-in to use a template and emit dist/index.html
   plugins: [
     new HtmlWebpackPlugin({
-      title: "Recoil Selectors Tutorial",
-      inject: false,
+      title: "Recoil Dispatcher Tutorial",
+      inject: true,
       template: HtmlWebpackTemplate,
       appMountId: "app",
     }),
