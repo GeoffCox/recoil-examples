@@ -62,13 +62,14 @@ The useRecoilCallback hook can be used to create a dispatcher. We'll add a facto
 //dispatcher.ts
 export const createDispatcher = () => {
   const logMessage = useRecoilCallback<[string], void>(
-    ({ set }) => (message: string) => {
-      console.log(`${message}`);
-      set(logEntryListState, (logEntries) => [...logEntries, message]);
-    }
+    ({ set }) =>
+      (message: string) => {
+        console.log(`${message}`);
+        set(logEntryListState, (logEntries) => [...logEntries, message]);
+      }
   );
-return {
-    logMessage
+  return {
+    logMessage,
   };
 };
 
@@ -93,10 +94,11 @@ Other state management libraries provide a dispatch method that takes a verb str
 
 ### Initializing the dispatcher
 
-You might notice that we didn't call createDispatcher() to initialize the default. This is because recoil hooks cannot be used during default initialization. 
+You might notice that we didn't call createDispatcher() to initialize the default. This is because recoil hooks cannot be used during default initialization.
 
 Each of these approaches returns the same error:
-- call createDispatcher directly, 
+
+- call createDispatcher directly,
 - wrapping createDispatcher in a Promise.resolve
 - wrapping createDispatcher within a useRecoilCallback
 - wrapping createDispatcher within a useRecoilCallback and then the callback within a Promise.resolve
@@ -125,7 +127,7 @@ The dispatcher can be accessed like any other atom.
 ```tsx
 const dispatcher = useRecoilValue(dispatcherState);
 
-dispatcher?.logMessage('Something happened');
+dispatcher?.logMessage("Something happened");
 ```
 
 ### Displaying log entries
@@ -135,17 +137,17 @@ We'll create a component to display log entries and add it to the TodoList compo
 ```tsx
 //Log.tsx
 export const Log = () => {
-    const logEntries = useRecoilValue(logEntryListState);
-    
-    return (
-        <>
-          {logEntries.map((entry, index) => (
-              <div key={index}>
-              <span>{entry}</span>              
-            </div>            
-          ))}
-        </>
-      );
+  const logEntries = useRecoilValue(logEntryListState);
+
+  return (
+    <>
+      {logEntries.map((entry, index) => (
+        <div key={index}>
+          <span>{entry}</span>
+        </div>
+      ))}
+    </>
+  );
 };
 ```
 
@@ -161,7 +163,6 @@ export const TodoList = () => {
 };
 ```
 
-
 ## Implementing the recycle bin feature
 
 Now that we have a basic dispatcher initialized and ready to use, we can add recycle bin behavior.
@@ -175,72 +176,84 @@ export const toDoRecycleBinState = atom<TodoItem[]>({
   default: [],
 });
 ```
+
 Next, we'll update the createDispatcher() with the necessary state update callbacks.
 
 ```typescript
 // dispatcher.ts
 export const createDispatcher = () => {
   const logMessage = useRecoilCallback<[string], void>(
-    ({ set }) => (message: string) => {
-      console.log(`${message}`);
-      set(logEntryListState, (logEntries) => [...logEntries, message]);
-    }
+    ({ set }) =>
+      (message: string) => {
+        console.log(`${message}`);
+        set(logEntryListState, (logEntries) => [...logEntries, message]);
+      }
   );
 
   const addItem = useRecoilCallback<[string], void>(
-    ({ set }) => (text: string) => {      
-
-      const newTodoItem = {
-        id: getId(),
-        text,
-        isComplete: false,
-      };
-      set(todoListState, (oldTodoList: TodoItem[]) => [
-        ...oldTodoList,
-        newTodoItem,
-      ]);
-      logMessage(`To Do: ${text} added`);
-    }
+    ({ set }) =>
+      (text: string) => {
+        const newTodoItem = {
+          id: getId(),
+          text,
+          isComplete: false,
+        };
+        set(todoListState, (oldTodoList: TodoItem[]) => [
+          ...oldTodoList,
+          newTodoItem,
+        ]);
+        logMessage(`To Do: ${text} added`);
+      }
   );
 
-  const deleteItem = useRecoilCallback<[number], void>(
-    ({ set }) => (index: number) => {
-      set(todoListState, (oldTodoList: TodoItem[]) => {
-        if (index < 0 || index >= oldTodoList.length) {
+  const deleteItem = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async (index: number) => {
+        let todoList = await snapshot.getPromise(todoListState);
+
+        if (index < 0 || index >= todoList.length) {
           throw new Error("Could not delete item. Index out of bounds.");
         }
 
-        const foundItem = oldTodoList[index];
+        const foundItem = todoList[index];
 
-        set(toDoRecycleBinState, (oldRecycleList: TodoItem[]) => [
-          ...oldRecycleList,
-          foundItem,
-        ]);
+        if (foundItem) {
+          set(todoListState, (oldTodoList: TodoItem[]) => {
+            return removeItemAtIndex(oldTodoList, index);
+          });
 
-        logMessage(`To Do: \"${foundItem.text}\" moved to recycle bin.`);
-        return removeItemAtIndex(oldTodoList, index);
-      });
-    }
+          set(toDoRecycleBinState, (oldRecycleList: TodoItem[]) => {
+            return [...oldRecycleList, foundItem];
+          });
+          logMessage(`Todo: \"${foundItem?.text}\" moved to recycle bin.`);
+        }
+      }
   );
 
-  const restoreItem = useRecoilCallback<[number], void>(
-    ({ set }) => (index: number) => {
-      set(toDoRecycleBinState, (oldRecycleList: TodoItem[]) => {
-        if (index < 0 || index >= oldRecycleList.length) {
+  const restoreItem = useRecoilCallback(
+    ({ snapshot, set }) =>
+      async (index: number) => {
+        let recycleList = await snapshot.getPromise(toDoRecycleBinState);
+
+        if (index < 0 || index >= recycleList.length) {
           throw new Error("Could not restore item. Index out of bounds.");
         }
 
-        const foundItem = oldRecycleList[index];
+        const foundItem = recycleList[index];
 
-        set(todoListState, (oldTodoList: TodoItem[]) => [
-          ...oldTodoList,
-          foundItem,
-        ]);
+        if (foundItem) {
+          set(toDoRecycleBinState, (oldRecycleList: TodoItem[]) => {
+            return removeItemAtIndex(oldRecycleList, index);
+          });
 
-        logMessage(`To Do: \"${foundItem.text}\" restored from recycle bin.`);
-        return removeItemAtIndex(oldRecycleList, index);
-      });
-    }
+          set(todoListState, (oldTodoList: TodoItem[]) => [
+            ...oldTodoList,
+            foundItem,
+          ]);
+
+          logMessage(`Todo: \"${foundItem.text}\" restored from recycle bin.`);
+        }
+      }
   );
 
   const emptyRecycleBin = useRecoilCallback(({ reset }) => () => {
@@ -259,6 +272,7 @@ export const createDispatcher = () => {
 
 export type Dispatcher = ReturnType<typeof createDispatcher>;
 ```
+
 We'll add a component that displays the recycle bin of items. It lets the user restore any item or emptying the recycle bin.
 
 ```tsx
@@ -302,14 +316,14 @@ export const TodoList = () => {
     //...
 };
 ```
-We'll update the ToDdoItemCreator and TodoListItem components to use the dispatcher. 
+
+We'll update the ToDdoItemCreator and TodoListItem components to use the dispatcher.
 
 Editing the item text or marking items complete could also be put moved to the dispatcher. They are left as-is to demonstrate updating recoil state from within components is compatible with using a dispatcher.
 
 ```tsx
 //TodoItemCreator.tsx
 export const TodoItemCreator = () => {
-  
   //...
   const dispatcher = useRecoilValue(dispatcherState);
 
@@ -325,10 +339,9 @@ export const TodoItemCreator = () => {
 ```tsx
 //TodoListItem.tsx
 export const TodoListItem = (props: Props) => {
-
   //...
   const dispatcher = useRecoilValue(dispatcherState);
-  
+
   //...
 
   const deleteItem = () => {
@@ -338,6 +351,7 @@ export const TodoListItem = (props: Props) => {
   //...
 };
 ```
+
 Now we have a To Do List application where deleting an item sends it to the recycle bin. We can restore items from the recycle bin or empty it to permanently delete items. We also have a log of all our actions.
 
 ## Epilogue: Handling large applications
